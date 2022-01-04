@@ -112,7 +112,7 @@ def RemoveStopWords(data):
     texts = [[word.lower() for word in text.split()] for text in d]
     tokens_without_sw=[]
     sw = set(stopwords.words('english'))
-    for i in range(0,len(texts)):
+    for i in range(0,len(texts)):#
         words_list = []
         for word in texts[i]:
         # print(word)
