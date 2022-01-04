@@ -152,6 +152,7 @@ def CheckURL(data):
     for i in range(0,len(data)):
         url =re.findall(regex, data.Tweet.iloc[i])
         list.append(url)
+        #
    
    # print("column[0] = {}".format(list[0]))
     print(list)  
