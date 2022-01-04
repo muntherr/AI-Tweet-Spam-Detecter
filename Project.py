@@ -107,22 +107,30 @@ def hashtags_words_ratio(data):
         data.loc[i, 'Hashtags_to_Words_Ratio'] = ratio
 
 
-# # pip install spam-blocklists 
-# def CheckURL(data):
-#     list =[]
-#     data['IsSpamUrl'] = ""
-#     data['IsSpamUrl'].fillna(0)
-#     checker = SpamHausChecker()
-#     regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
-#     for i in range(0,len(data)):
-#         url =re.findall(regex, data.Tweet.iloc[i])
-#         list.append(url)
-   
-#    # print("column[0] = {}".format(list[0]))
-#     print(list)
-    
-        
+def RemoveStopWords(data):
+    d = [line.strip() for line in data['Tweet']] 
+    texts = [[word.lower() for word in text.split()] for text in d]
+    tokens_without_sw=[]
+    sw = set(stopwords.words('english'))
+    for i in range(0,len(texts)):
+        words_list = []
+        for word in texts[i]:
+        # print(word)
+            if not (word in sw):
+                words_list.append(word)
+        tokens_without_sw.append(words_list)
+    texts = tokens_without_sw
+    s = pd.Series(texts)
+    for i in range(0,len(s)):
+        data.loc[i, 'Tweet'] = " ".join((s)[i])
+    return data
 
+def RemoveSpecialChar(data):
+    out_list = [re.sub(r'[^a-zA-Z0-9]', ' ', word) for word in data['Tweet']]
+    print(out_list)
+    s = pd.Series(out_list)
+    for i in range(0,len(s)):
+        data.loc[i, 'Tweet'] = "".join((s)[i])
 
 def Stemming(data):
     # We need to split each words in each sentences to do stimming on each words
@@ -134,61 +142,33 @@ def Stemming(data):
     for i in range(0,len(s)):
         data.loc[i, 'Tweet'] = " ".join((s)[i])
 
-    
+  
+# pip install spam-blocklists 
+def CheckURL(data):
+    list =[]
+    data['IsSpamUrl'] = ""
+    data['IsSpamUrl'].fillna(0)
+    checker = SpamHausChecker()
+    regex = r"(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:'\".,<>?«»“”‘’]))"
+    for i in range(0,len(data)):
+        url =re.findall(regex, data.Tweet.iloc[i])
+        list.append(url)
+   
+   # print("column[0] = {}".format(list[0]))
+    print(list)  
 
    
    
-
-
-    # for i in range(0,len(documents)):
-    #     for word in documents[i]:
-    #         word = stem([word])
-
-    #documents=" ".join(documents)
-    # for i in range (0,5):
-    #     print(documents[i])
-    # for i in range(0,len(d)):
-    #     for word in d[i]:
-    #         print(word)
-    #         print(lancaster.stem(word))   
-    
-#     ps = PorterStemmer()
-#     sentence = []
-#     sentence = data['Tweet']
-#     tokenized_sents = [word_tokenize(i) for i in sentence]
-#     print(tokenized_sents)
-    # token_words = word_tokenize(sentence)
-    # token_words
-    # stem_sentence = []
-    # for word in token_words:
-    #     stem_sentence.append(ps.stem(word))
-    #     stem_sentence.append(" ")
-    # print("".join(stem_sentence))
-    # list_of_tokens =[]
-    # l = data['Tweet']
-    # print(l)
-    # for column in l:
-    #     text_tokens = word_tokenize(column)
-    #     list_of_tokens.append(text_tokens)
-    # len(list_of_tokens)
-    # print(list_of_tokens)
-    # #create an object of class PorterStemmer
-    # porter = PorterStemmer()
-    # lancaster=LancasterStemmer()
-    #for word in data['Tweet']:
-        # print(word)
-        # print(lancaster.stem(word))
-    #data.loc[i, 'Tweet'] = porter.stem(word)
-
-
-#def TextPreprocessing(data):
 
 
 
 #Import training file and preparing data
 data = pd.read_csv('train.csv',low_memory=False)
-print(data)
-Stemming(data)
+#print(data)
+data = RemoveStopWords(data)
+
+RemoveSpecialChar(data)
+#Stemming(data)
 data.to_csv('ProcessedData.csv',index=False)
 
 
