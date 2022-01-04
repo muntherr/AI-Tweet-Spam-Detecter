@@ -60,7 +60,6 @@ def noOfMentions(data):
         #data.to_csv("ProcessedData.csv", index=False)
 
 def noOfChar(data):
-
     data['Number of characters']=""
     data['Number of characters'].fillna(0)
     for i in range(0, len(data)):
@@ -106,7 +105,7 @@ def hashtags_words_ratio(data):
         ratio= (np.double)(df.Hashtags.iloc[i])/(np.double)(df.Words.iloc[i])
         data.loc[i, 'Hashtags_to_Words_Ratio'] = ratio
 
-
+# Remove Stop Words From tweets and convert them to lower case
 def RemoveStopWords(data):
     d = [line.strip() for line in data['Tweet']] 
     texts = [[word.lower() for word in text.split()] for text in d]
@@ -124,7 +123,7 @@ def RemoveStopWords(data):
     for i in range(0,len(s)):
         data.loc[i, 'Tweet'] = " ".join((s)[i])
     return data
-
+#Remove Special Chars from the tweets
 def RemoveSpecialChar(data):
     out_list = [re.sub(r'[^a-zA-Z0-9]', ' ', word) for word in data['Tweet']]
     print(out_list)
@@ -157,6 +156,26 @@ def CheckURL(data):
    # print("column[0] = {}".format(list[0]))
     print(list)  
 
+# In this Function we need to normalize a numerical values from data set
+def Normalization(data):
+    x_data = data[['following','followers','actions']]
+    x_data = x_data.apply(lambda x: (x - x.min(axis=0) ) /x.max(axis=0)-x.min(axis=0))
+    print(data['following'] )
+    for i in range(0,len(data)):
+        data.loc[i, 'following'] = x_data['following'][i]
+        data.loc[i, 'followers'] = x_data['followers'][i]
+        data.loc[i, 'actions'] = x_data['actions'][i]
+
+
+    #data['following'] = ([x_data.following])
+    print(x_data['following'] )
+
+    # for i in range(0, len(data)):
+    #     #print(result)
+    #     data.loc[i, 'following'] = x_data['following']
+    #     # data.loc[i, 'followers'] = x_data.followers
+    #     # data.loc[i, 'actions'] = x_data.actions
+
    
    
 
@@ -165,15 +184,16 @@ def CheckURL(data):
 #Import training file and preparing data
 data = pd.read_csv('train.csv',low_memory=False)
 #print(data)
-data = RemoveStopWords(data)
+# data = RemoveStopWords(data)
 
-RemoveSpecialChar(data)
+# RemoveSpecialChar(data)
 #Stemming(data)
-data.to_csv('ProcessedData.csv',index=False)
+#data.to_csv('ProcessedData.csv',index=False)
 
 
 
-# NanValueHandling(data)c
+NanValueHandling(data)
+Normalization(data)
 # noOfURLs(data)
 # noOfMentions(data)
 # noOfChar(data)
@@ -184,7 +204,7 @@ data.to_csv('ProcessedData.csv',index=False)
 #CheckURL(data)
 
 #print(data['location'].mode())
-#data.to_csv("ProcessedData.csv", index=False)
+data.to_csv("ProcessedData.csv", index=False)
 
 
 
